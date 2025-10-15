@@ -48,7 +48,7 @@ CREATE TABLE public.document_chunks (
   industry_profile_id UUID REFERENCES public.industry_profiles(id) ON DELETE CASCADE,
   content TEXT NOT NULL,
   metadata JSONB DEFAULT '{}',
-  embedding VECTOR(1536), -- OpenAI text-embedding-3-small dimensions
+  embedding VECTOR(768), -- Google AI text-embedding-004 dimensions
   chunk_index INTEGER NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -227,7 +227,7 @@ CREATE TRIGGER update_chat_sessions_updated_at BEFORE UPDATE ON public.chat_sess
 
 -- Function for vector similarity search
 CREATE OR REPLACE FUNCTION match_documents(
-  query_embedding VECTOR(1536),
+  query_embedding VECTOR(768),
   match_count INT DEFAULT 5,
   filter JSONB DEFAULT '{}'
 )

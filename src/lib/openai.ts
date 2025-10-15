@@ -1,13 +1,11 @@
-import OpenAI from 'openai'
+import { GoogleGenerativeAI } from '@google/generative-ai'
 
-// OpenAI client configuration
-export const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-})
+// Google AI client configuration
+export const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
 
 // Model configurations
-export const CHAT_MODEL = process.env.CHAT_MODEL || 'gpt-4o-mini'
-export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL || 'text-embedding-3-small'
+export const CHAT_MODEL = process.env.CHAT_MODEL || 'gemini-1.5-flash'
+export const EMBEDDING_MODEL = process.env.EMBEDDING_MODEL || 'text-embedding-004'
 
-// Embedding dimensions for text-embedding-3-small
-export const EMBEDDING_DIMENSIONS = 1536
+// Embedding dimensions for text-embedding-004
+export const EMBEDDING_DIMENSIONS = 768

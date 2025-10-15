@@ -1,5 +1,5 @@
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
-import { OpenAIEmbeddings } from '@langchain/openai'
+import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai'
 import { EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from './openai'
 
 // Text splitter configuration for document chunking
@@ -9,10 +9,10 @@ export const textSplitter = new RecursiveCharacterTextSplitter({
   separators: ['\n\n', '\n', ' ', ''], // Split on paragraphs, lines, words
 })
 
-// OpenAI embeddings configuration
-export const embeddings = new OpenAIEmbeddings({
+// Google AI embeddings configuration
+export const embeddings = new GoogleGenerativeAIEmbeddings({
   modelName: EMBEDDING_MODEL,
-  dimensions: EMBEDDING_DIMENSIONS,
+  maxRetries: 3,
 })
 
 // Document processing utilities

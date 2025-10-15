@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/ssr'
-import { openai, CHAT_MODEL } from '@/lib/openai'
+import { genAI, CHAT_MODEL } from '@/lib/openai'
 import { supabaseAdmin } from '@/lib/supabase'
 
 interface Message {
@@ -42,12 +42,13 @@ export async function POST(request: NextRequest) {
     if (useRAG) {
       try {
         // Generate embedding for the user message
-        const embeddingResponse = await openai.embeddings.create({
-          model: 'text-embedding-3-small',
-          input: message,
+        const { GoogleGenerativeAIEmbeddings } = await import('@langchain/google-genai')
+        const embeddings = new GoogleGenerativeAIEmbeddings({
+          modelName: 'text-embedding-004',
+          maxRetries: 3,
         })
-
-        const queryEmbedding = embeddingResponse.data[0].embedding
+        
+        const queryEmbedding = await embeddings.embedQuery(message)
 
         // Search for similar chunks
         const { data: chunks, error: searchError } = await supabaseAdmin.rpc(
@@ -79,36 +80,40 @@ export async function POST(request: NextRequest) {
       systemPrompt += '\n\nKnowledge base is disabled. Provide a general answer without citing specific documents.'
     }
 
-    // Prepare messages for OpenAI
-    const openaiMessages = [
-      { role: 'system', content: systemPrompt },
-      ...messages.map((msg: Message) => ({
-        role: msg.role,
-        content: msg.content,
-      })),
-    ]
+    // Prepare messages for Google AI
+    const model = genAI.getGenerativeModel({ model: CHAT_MODEL })
+    
+    // Convert messages to Google AI format
+    const chatHistory = messages.map((msg: Message) => ({
+      role: msg.role === 'assistant' ? 'model' : 'user',
+      parts: [{ text: msg.content }]
+    }))
 
     // Create streaming response
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          const completion = await openai.chat.completions.create({
-            model: CHAT_MODEL,
-            messages: openaiMessages as any,
-            temperature: industryProfile.temperature,
-            stream: true,
+          const chat = model.startChat({
+            history: chatHistory,
+            generationConfig: {
+              temperature: industryProfile.temperature,
+              maxOutputTokens: 2048,
+            },
+            systemInstruction: systemPrompt,
           })
 
           let fullContent = ''
           const citations: Array<{ source: string; url?: string; content: string }> = []
 
-          for await (const chunk of completion) {
-            const content = chunk.choices[0]?.delta?.content || ''
-            if (content) {
-              fullContent += content
+          const result = await chat.sendMessageStream(message)
+          
+          for await (const chunk of result.stream) {
+            const chunkText = chunk.text()
+            if (chunkText) {
+              fullContent += chunkText
               
               // Send content chunk
-              const data = JSON.stringify({ type: 'content', content })
+              const data = JSON.stringify({ type: 'content', content: chunkText })
               controller.enqueue(new TextEncoder().encode(`data: ${data}\n\n`))
             }
           }
