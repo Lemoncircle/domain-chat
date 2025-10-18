@@ -40,7 +40,7 @@ export default function ChatInterface() {
   const [isStreaming, setIsStreaming] = useState(false)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [selectedIndustry, setSelectedIndustry] = useState<IndustryProfile | null>(null)
-  const [useRAG, setUseRAG] = useState(false) // Disabled for testing
+  const [useRAG, setUseRAG] = useState(true) // Enabled for testing
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   // TEMPORARILY DISABLED: Mock industry profile for testing
