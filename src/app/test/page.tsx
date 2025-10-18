@@ -3,11 +3,12 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
+import { User } from '@supabase/supabase-js'
 
 export default function TestPage() {
   const [envStatus, setEnvStatus] = useState('')
   const [authStatus, setAuthStatus] = useState('')
-  const [user, setUser] = useState(null)
+  const [user, setUser] = useState<User | null>(null)
 
   useEffect(() => {
     // Check environment variables
