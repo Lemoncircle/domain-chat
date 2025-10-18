@@ -1,7 +1,7 @@
 import { textSplitter, embeddings, DocumentChunk, ProcessedDocument } from '@/lib/langchain'
 import { supabaseAdmin } from '@/lib/supabase'
-import pdf from 'pdf-parse'
-import mammoth from 'mammoth'
+import * as pdf from 'pdf-parse'
+import * as mammoth from 'mammoth'
 
 export interface DocumentMetadata {
   source: string
@@ -64,7 +64,7 @@ export async function processDocument(
 // Extract text from PDF
 export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
   try {
-    const data = await pdf(buffer)
+    const data = await pdf.default(buffer)
     return data.text
   } catch (error) {
     console.error('Error extracting text from PDF:', error)
@@ -75,7 +75,7 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
 // Extract text from DOCX
 export async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
   try {
-    const result = await mammoth.extractRawText({ buffer })
+    const result = await mammoth.default.extractRawText({ buffer })
     return result.value
   } catch (error) {
     console.error('Error extracting text from DOCX:', error)
