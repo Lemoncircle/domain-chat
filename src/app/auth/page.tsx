@@ -1,17 +1,30 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export default function AuthPage() {
+  const router = useRouter()
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [message, setMessage] = useState('')
+
+  // Check if user is already authenticated and redirect
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/')
+      }
+    }
+    checkAuth()
+  }, [router])
 
   // Handle email/password authentication
   const handleEmailAuth = async (e: React.FormEvent) => {
@@ -28,6 +41,10 @@ export default function AuthPage() {
         })
         if (error) throw error
         setMessage('Successfully signed in!')
+        // Redirect to home page after successful login
+        setTimeout(() => {
+          router.push('/')
+        }, 1000)
       } else {
         // Sign up
         const { error } = await supabase.auth.signUp({
