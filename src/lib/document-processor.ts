@@ -5,7 +5,7 @@ export interface DocumentMetadata {
   source: string
   url?: string
   type: string
-  [key: string]: any
+  [key: string]: unknown
 }
 
 // Process different document types
@@ -60,7 +60,7 @@ export async function processDocument(
 }
 
 // Extract text from PDF (simplified version)
-export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
+export async function extractTextFromPDF(): Promise<string> {
   try {
     // For now, return a placeholder - we'll implement this later
     return 'PDF content extraction temporarily disabled for deployment'
@@ -71,7 +71,7 @@ export async function extractTextFromPDF(buffer: Buffer): Promise<string> {
 }
 
 // Extract text from DOCX (simplified version)
-export async function extractTextFromDOCX(buffer: Buffer): Promise<string> {
+export async function extractTextFromDOCX(): Promise<string> {
   try {
     // For now, return a placeholder - we'll implement this later
     return 'DOCX content extraction temporarily disabled for deployment'
@@ -122,10 +122,10 @@ export async function processFileUpload(
 
   switch (file.type) {
     case 'application/pdf':
-      content = await extractTextFromPDF(buffer)
+      content = await extractTextFromPDF()
       break
     case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
-      content = await extractTextFromDOCX(buffer)
+      content = await extractTextFromDOCX()
       break
     case 'text/plain':
     case 'text/markdown':

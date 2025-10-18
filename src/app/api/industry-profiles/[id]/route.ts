@@ -3,10 +3,11 @@ import { supabaseAdmin } from '@/lib/supabase'
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const { name, description, system_prompt, temperature, top_k } = await request.json()
+    const { id } = await params
 
     if (!name || !system_prompt) {
       return NextResponse.json({ error: 'Name and system prompt are required' }, { status: 400 })
@@ -22,7 +23,7 @@ export async function PUT(
         top_k: top_k || 5,
         updated_at: new Date().toISOString(),
       })
-      .eq('id', params.id)
+      .eq('id', id)
       .select()
       .single()
 
@@ -40,13 +41,15 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const { error } = await supabaseAdmin
       .from('industry_profiles')
       .delete()
-      .eq('id', params.id)
+      .eq('id', id)
 
     if (error) {
       console.error('Error deleting industry profile:', error)

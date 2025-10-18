@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@langchain/core": "^0.3.78",
     "@langchain/google-genai": "^0.1.0",
     "@langchain/textsplitters": "^0.1.0",
     "@radix-ui/react-dialog": "^1.1.15",

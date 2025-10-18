@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -55,17 +55,7 @@ export default function AdminPanel() {
     file: null as File | null,
   })
 
-  useEffect(() => {
-    loadIndustryProfiles()
-  }, [])
-
-  useEffect(() => {
-    if (selectedIndustry) {
-      loadDataSources(selectedIndustry.id)
-    }
-  }, [selectedIndustry])
-
-  const loadIndustryProfiles = async () => {
+  const loadIndustryProfiles = useCallback(async () => {
     try {
       const response = await fetch('/api/industry-profiles')
       if (response.ok) {
@@ -78,7 +68,17 @@ export default function AdminPanel() {
     } catch (error) {
       console.error('Error loading industry profiles:', error)
     }
-  }
+  }, [selectedIndustry])
+
+  useEffect(() => {
+    loadIndustryProfiles()
+  }, [loadIndustryProfiles])
+
+  useEffect(() => {
+    if (selectedIndustry) {
+      loadDataSources(selectedIndustry.id)
+    }
+  }, [selectedIndustry])
 
   const loadDataSources = async (industryId: string) => {
     try {

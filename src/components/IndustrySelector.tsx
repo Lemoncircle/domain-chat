@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ChevronDown, Settings } from 'lucide-react'
@@ -30,11 +30,7 @@ export default function IndustrySelector({
   const [isOpen, setIsOpen] = useState(false)
   const [industryProfiles, setIndustryProfiles] = useState<IndustryProfile[]>([])
 
-  useEffect(() => {
-    loadIndustryProfiles()
-  }, [])
-
-  const loadIndustryProfiles = async () => {
+  const loadIndustryProfiles = useCallback(async () => {
     try {
       const response = await fetch('/api/industry-profiles')
       if (response.ok) {
@@ -47,7 +43,11 @@ export default function IndustrySelector({
     } catch (error) {
       console.error('Error loading industry profiles:', error)
     }
-  }
+  }, [selectedIndustry, onIndustryChange])
+
+  useEffect(() => {
+    loadIndustryProfiles()
+  }, [loadIndustryProfiles])
 
   const handleIndustrySelect = (industry: IndustryProfile) => {
     onIndustryChange(industry)

@@ -69,10 +69,11 @@ export async function POST(request: NextRequest) {
       chunksProcessed: result.totalChunks,
       message: `Successfully processed ${result.totalChunks} chunks`,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Document ingestion error:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Failed to process document'
     return NextResponse.json({ 
-      error: error.message || 'Failed to process document' 
+      error: errorMessage
     }, { status: 500 })
   }
 }

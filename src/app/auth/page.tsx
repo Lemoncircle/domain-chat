@@ -37,8 +37,9 @@ export default function AuthPage() {
         if (error) throw error
         setMessage('Check your email for the confirmation link!')
       }
-    } catch (error: any) {
-      setMessage(error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Authentication failed'
+      setMessage(errorMessage)
     } finally {
       setLoading(false)
     }
@@ -63,8 +64,9 @@ export default function AuthPage() {
       })
       if (error) throw error
       setMessage('Check your email for the magic link!')
-    } catch (error: any) {
-      setMessage(error.message)
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Magic link failed'
+      setMessage(errorMessage)
     } finally {
       setLoading(false)
     }

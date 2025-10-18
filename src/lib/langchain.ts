@@ -1,6 +1,6 @@
 import { RecursiveCharacterTextSplitter } from '@langchain/textsplitters'
 import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai'
-import { EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from './openai'
+import { EMBEDDING_MODEL } from './openai'
 
 // Text splitter configuration for document chunking
 export const textSplitter = new RecursiveCharacterTextSplitter({
@@ -13,6 +13,7 @@ export const textSplitter = new RecursiveCharacterTextSplitter({
 export const embeddings = new GoogleGenerativeAIEmbeddings({
   modelName: EMBEDDING_MODEL,
   maxRetries: 3,
+  apiKey: process.env.GOOGLE_AI_API_KEY || 'placeholder_api_key',
 })
 
 // Document processing utilities
@@ -21,7 +22,7 @@ export interface DocumentChunk {
   metadata: {
     source: string
     chunkIndex: number
-    [key: string]: any
+    [key: string]: unknown
   }
 }
 

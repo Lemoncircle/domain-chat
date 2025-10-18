@@ -30,7 +30,7 @@ interface IndustryProfile {
 }
 
 export default function ChatInterface() {
-  const { user, profile, signOut } = useAuth()
+  const { signOut } = useAuth()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -86,7 +86,7 @@ export default function ChatInterface() {
       const reader = response.body?.getReader()
       if (!reader) throw new Error('No response body')
 
-      let assistantMessage: Message = {
+      const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
         content: '',
@@ -123,14 +123,14 @@ export default function ChatInterface() {
                     : msg
                 )
               )
-            } catch (e) {
+            } catch {
               // Ignore parsing errors for incomplete chunks
             }
           }
         }
       }
-    } catch (error: any) {
-      if (error.name === 'AbortError') {
+    } catch (error: unknown) {
+      if (error instanceof Error && error.name === 'AbortError') {
         console.log('Request aborted')
       } else {
         console.error('Error sending message:', error)

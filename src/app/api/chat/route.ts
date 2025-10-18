@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/ssr'
 import { genAI, CHAT_MODEL } from '@/lib/openai'
 import { supabaseAdmin } from '@/lib/supabase'
 
@@ -38,7 +37,14 @@ export async function POST(request: NextRequest) {
     let systemPrompt = industryProfile.system_prompt
 
     // If RAG is enabled, retrieve relevant documents
-    let retrievedChunks: any[] = []
+    let retrievedChunks: Array<{
+      content: string
+      metadata?: {
+        source?: string
+        url?: string
+        [key: string]: unknown
+      }
+    }> = []
     if (useRAG) {
       try {
         // Generate embedding for the user message
@@ -65,7 +71,7 @@ export async function POST(request: NextRequest) {
           
           // Add context to system prompt
           const contextText = chunks
-            .map((chunk: any) => `Source: ${chunk.metadata?.source || 'Unknown'}\nContent: ${chunk.content}`)
+            .map((chunk: { content: string; metadata?: { source?: string } }) => `Source: ${chunk.metadata?.source || 'Unknown'}\nContent: ${chunk.content}`)
             .join('\n\n')
           
           systemPrompt += `\n\nRelevant context from knowledge base:\n${contextText}\n\nWhen answering, cite the sources using [Source: filename] format.`
@@ -120,7 +126,7 @@ export async function POST(request: NextRequest) {
 
           // Extract citations from the response
           if (useRAG && retrievedChunks.length > 0) {
-            retrievedChunks.forEach((chunk: any) => {
+            retrievedChunks.forEach((chunk: { content: string; metadata?: { source?: string; url?: string } }) => {
               if (fullContent.toLowerCase().includes(chunk.metadata?.source?.toLowerCase() || '')) {
                 citations.push({
                   source: chunk.metadata?.source || 'Unknown',

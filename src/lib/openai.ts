@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai'
 
 // Google AI client configuration
-export const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY!)
+export const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY || 'placeholder_api_key')
 
 // Model configurations
 export const CHAT_MODEL = process.env.CHAT_MODEL || 'gemini-1.5-flash'
