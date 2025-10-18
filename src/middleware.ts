@@ -7,6 +7,7 @@ export async function middleware(request: NextRequest) {
   
   // Skip middleware if Supabase is not properly configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    console.log('Middleware: Supabase not configured, skipping auth check')
     return response
   }
   
@@ -94,7 +95,8 @@ export const config = {
      * - public folder
      * - auth routes (to prevent redirect loops)
      * - api routes (let them handle their own auth)
+     * - test routes (for debugging)
      */
-    '/((?!_next/static|_next/image|favicon.ico|auth|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|auth|api|test|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }
