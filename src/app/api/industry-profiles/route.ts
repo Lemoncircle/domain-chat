@@ -1,9 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockIndustryProfiles } from '@/lib/mock-db'
+import { MockDatabase } from '@/lib/mock-db'
 
 export async function GET() {
   try {
-    return NextResponse.json(mockIndustryProfiles)
+    const mockDb = MockDatabase.getInstance()
+    return NextResponse.json(mockDb.getIndustryProfiles())
   } catch (error) {
     console.error('Error fetching industry profiles:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Name is required' }, { status: 400 })
     }
 
-    // Create new profile and add to mock database
+    // Create new profile
     const newProfile = {
       id: `profile-${Date.now()}`,
       name,
@@ -30,11 +31,9 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString()
     }
 
-    // Add to mock database
-    mockIndustryProfiles.push(newProfile)
-
-    console.log('Created profile:', newProfile)
-    console.log('Total profiles:', mockIndustryProfiles.length)
+    // Add to mock database using singleton
+    const mockDb = MockDatabase.getInstance()
+    mockDb.addIndustryProfile(newProfile)
     
     return NextResponse.json(newProfile)
   } catch (error) {

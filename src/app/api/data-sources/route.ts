@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockDataSources } from '@/lib/mock-db'
+import { MockDatabase } from '@/lib/mock-db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -10,10 +10,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Industry ID is required' }, { status: 400 })
     }
 
-    // Filter data sources by industry
-    const filteredSources = mockDataSources.filter(source => 
-      source.industry_profile_id === industryId
-    )
+    // Get data sources by industry using singleton
+    const mockDb = MockDatabase.getInstance()
+    const filteredSources = mockDb.getDataSourcesByIndustry(industryId)
 
     return NextResponse.json(filteredSources)
   } catch (error) {
@@ -36,7 +35,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    // Create new data source and add to mock database
+    // Create new data source
     const newSource = {
       id: `source-${Date.now()}`,
       industry_profile_id: industryId,
@@ -48,11 +47,9 @@ export async function POST(request: NextRequest) {
       created_at: new Date().toISOString()
     }
 
-    // Add to mock database
-    mockDataSources.push(newSource)
-
-    console.log('Created data source:', newSource)
-    console.log('Total data sources:', mockDataSources.length)
+    // Add to mock database using singleton
+    const mockDb = MockDatabase.getInstance()
+    mockDb.addDataSource(newSource)
     
     return NextResponse.json(newSource)
   } catch (error) {

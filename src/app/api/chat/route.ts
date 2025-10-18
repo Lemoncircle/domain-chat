@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { mockIndustryProfiles, mockDataSources } from '@/lib/mock-db'
+import { MockDatabase } from '@/lib/mock-db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,8 +9,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
+    // Get singleton instance
+    const mockDb = MockDatabase.getInstance()
+    
     // Find the industry profile
-    const industryProfile = mockIndustryProfiles.find(p => p.id === industryProfileId)
+    const industryProfiles = mockDb.getIndustryProfiles()
+    const industryProfile = industryProfiles.find(p => p.id === industryProfileId)
+    
     if (!industryProfile) {
       return NextResponse.json({ error: 'Industry profile not found' }, { status: 404 })
     }
@@ -20,9 +25,7 @@ export async function POST(request: NextRequest) {
     
     if (useRAG) {
       // Find relevant data sources for this industry
-      const relevantSources = mockDataSources.filter(source => 
-        source.industry_profile_id === industryProfileId
-      )
+      const relevantSources = mockDb.getDataSourcesByIndustry(industryProfileId)
       
       if (relevantSources.length > 0) {
         responseText = `Based on the uploaded documents for "${industryProfile.name}", I can help you with information about:\n\n`
