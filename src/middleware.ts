@@ -1,4 +1,3 @@
-import { createServerClient } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
@@ -7,85 +6,6 @@ export async function middleware(request: NextRequest) {
   
   // TEMPORARILY DISABLED: Skip all authentication checks
   console.log('Middleware: Authentication disabled for testing')
-  return response
-  
-  // Skip middleware if Supabase is not properly configured
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
-    console.log('Middleware: Supabase not configured, skipping auth check')
-    return response
-  }
-  
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: Record<string, unknown>) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: Record<string, unknown>) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
-      },
-    }
-  )
-
-  // Refresh session if expired
-  await supabase.auth.getSession()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Protected routes that require authentication
-  const protectedRoutes = ['/', '/admin']
-  const isProtectedRoute = protectedRoutes.some(route => 
-    request.nextUrl.pathname.startsWith(route)
-  )
-
-  // Admin routes that require admin role
-  const isAdminRoute = request.nextUrl.pathname.startsWith('/admin')
-
-  if (isProtectedRoute && !user) {
-    // Redirect to auth page if not authenticated
-    return NextResponse.redirect(new URL('/auth', request.url))
-  }
-
-  if (isAdminRoute && user) {
-    // Check if user is admin
-    const { data: profile } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .single()
-
-    if (profile?.role !== 'admin') {
-      // Redirect to home if not admin
-      return NextResponse.redirect(new URL('/', request.url))
-    }
-  }
-
   return response
 }
 

@@ -1,6 +1,3 @@
-import { textSplitter, embeddings, DocumentChunk, ProcessedDocument } from '@/lib/langchain'
-import { supabaseAdmin } from '@/lib/supabase'
-
 export interface DocumentMetadata {
   source: string
   url?: string
@@ -8,50 +5,43 @@ export interface DocumentMetadata {
   [key: string]: unknown
 }
 
-// Process different document types
+export interface ProcessedDocument {
+  chunks: Array<{
+    content: string
+    metadata: DocumentMetadata & { chunkIndex: number }
+  }>
+  totalChunks: number
+}
+
+// TEMPORARILY DISABLED: Mock document processing for testing
 export async function processDocument(
   content: string,
   metadata: DocumentMetadata,
   industryProfileId: string
 ): Promise<ProcessedDocument> {
   try {
-    // Split document into chunks
-    const chunks = await textSplitter.splitText(content)
+    console.log('Mock document processing:', { 
+      content: content.substring(0, 100) + '...', 
+      metadata, 
+      industryProfileId 
+    })
     
-    const documentChunks: DocumentChunk[] = chunks.map((chunk, index) => ({
-      content: chunk,
-      metadata: {
-        ...metadata,
-        chunkIndex: index,
-      },
-    }))
-
-    // Generate embeddings for each chunk
-    const embeddingsList = await embeddings.embedDocuments(
-      documentChunks.map(chunk => chunk.content)
-    )
-
-    // Store chunks in database
-    const chunkInserts = documentChunks.map((chunk, index) => ({
-      data_source_id: metadata.source, // This will be updated with actual data source ID
-      industry_profile_id: industryProfileId,
-      content: chunk.content,
-      metadata: chunk.metadata,
-      embedding: embeddingsList[index],
-      chunk_index: index,
-    }))
-
-    const { error } = await supabaseAdmin
-      .from('document_chunks')
-      .insert(chunkInserts)
-
-    if (error) {
-      throw new Error(`Failed to store document chunks: ${error.message}`)
-    }
-
+    // Simulate processing delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    // Return mock processed document
+    const mockChunks = [
+      {
+        content: content.substring(0, 500),
+        metadata: { ...metadata, chunkIndex: 0 }
+      }
+    ]
+    
+    console.log('Mock document processing completed')
+    
     return {
-      chunks: documentChunks,
-      totalChunks: documentChunks.length,
+      chunks: mockChunks,
+      totalChunks: mockChunks.length,
     }
   } catch (error) {
     console.error('Error processing document:', error)

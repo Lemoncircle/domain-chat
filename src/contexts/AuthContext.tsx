@@ -33,6 +33,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Get initial session
     const getInitialSession = async () => {
+      if (!supabase) {
+        setLoading(false)
+        return
+      }
+
       const { data: { session } } = await supabase.auth.getSession()
       setUser(session?.user ?? null)
       

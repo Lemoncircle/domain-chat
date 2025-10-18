@@ -1,53 +1,59 @@
-import { NextResponse } from 'next/server'
-import { supabaseAdmin } from '@/lib/supabase'
+import { NextRequest, NextResponse } from 'next/server'
 
 export async function GET() {
   try {
-    const { data: profiles, error } = await supabaseAdmin
-      .from('industry_profiles')
-      .select('*')
-      .order('created_at', { ascending: false })
+    // TEMPORARILY DISABLED: Mock industry profiles for testing
+    const mockProfiles = [
+      {
+        id: 'general',
+        name: 'General Chat',
+        description: 'General purpose AI chat for testing',
+        system_prompt: 'You are a helpful AI assistant.',
+        temperature: 0.7,
+        top_k: 5,
+        created_at: new Date().toISOString()
+      },
+      {
+        id: 'tech',
+        name: 'Technology',
+        description: 'AI chat focused on technology topics',
+        system_prompt: 'You are a technology expert AI assistant.',
+        temperature: 0.7,
+        top_k: 5,
+        created_at: new Date().toISOString()
+      }
+    ]
 
-    if (error) {
-      console.error('Error fetching industry profiles:', error)
-      return NextResponse.json({ error: 'Failed to fetch industry profiles' }, { status: 500 })
-    }
-
-    return NextResponse.json(profiles)
+    return NextResponse.json(mockProfiles)
   } catch (error) {
-    console.error('Unexpected error:', error)
+    console.error('Error fetching industry profiles:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
-    const { name, description, system_prompt, temperature, top_k } = await request.json()
+    const body = await request.json()
+    const { name, description, system_prompt, temperature, top_k } = body
 
     if (!name || !system_prompt) {
       return NextResponse.json({ error: 'Name and system prompt are required' }, { status: 400 })
     }
 
-    const { data: profile, error } = await supabaseAdmin
-      .from('industry_profiles')
-      .insert({
-        name,
-        description,
-        system_prompt,
-        temperature: temperature || 0.7,
-        top_k: top_k || 5,
-      })
-      .select()
-      .single()
-
-    if (error) {
-      console.error('Error creating industry profile:', error)
-      return NextResponse.json({ error: 'Failed to create industry profile' }, { status: 500 })
+    // TEMPORARILY DISABLED: Mock response for testing
+    const mockProfile = {
+      id: `mock-profile-${Date.now()}`,
+      name,
+      description: description || '',
+      system_prompt,
+      temperature: temperature || 0.7,
+      top_k: top_k || 5,
+      created_at: new Date().toISOString()
     }
 
-    return NextResponse.json(profile)
+    return NextResponse.json(mockProfile)
   } catch (error) {
-    console.error('Unexpected error:', error)
+    console.error('Error creating industry profile:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
 }
