@@ -30,15 +30,32 @@ interface IndustryProfile {
 }
 
 export default function ChatInterface() {
-  const { signOut } = useAuth()
+  // TEMPORARILY DISABLED: Skip authentication for testing
+  const signOut = async () => {
+    console.log('Sign out disabled for testing')
+  }
+  
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const [isStreaming, setIsStreaming] = useState(false)
   const [abortController, setAbortController] = useState<AbortController | null>(null)
   const [selectedIndustry, setSelectedIndustry] = useState<IndustryProfile | null>(null)
-  const [useRAG, setUseRAG] = useState(true)
+  const [useRAG, setUseRAG] = useState(false) // Disabled for testing
   const messagesEndRef = useRef<HTMLDivElement>(null)
+
+  // TEMPORARILY DISABLED: Mock industry profile for testing
+  useEffect(() => {
+    const mockIndustry: IndustryProfile = {
+      id: 'test-industry',
+      name: 'General Chat',
+      description: 'General purpose AI chat for testing',
+      system_prompt: 'You are a helpful AI assistant. Provide clear and helpful responses.',
+      temperature: 0.7,
+      top_k: 5
+    }
+    setSelectedIndustry(mockIndustry)
+  }, [])
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

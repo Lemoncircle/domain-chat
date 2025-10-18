@@ -30,24 +30,31 @@ export default function IndustrySelector({
   const [isOpen, setIsOpen] = useState(false)
   const [industryProfiles, setIndustryProfiles] = useState<IndustryProfile[]>([])
 
-  const loadIndustryProfiles = useCallback(async () => {
-    try {
-      const response = await fetch('/api/industry-profiles')
-      if (response.ok) {
-        const profiles = await response.json()
-        setIndustryProfiles(profiles)
-        if (profiles.length > 0 && !selectedIndustry) {
-          onIndustryChange(profiles[0])
-        }
+  // TEMPORARILY DISABLED: Mock industry profiles for testing
+  useEffect(() => {
+    const mockProfiles: IndustryProfile[] = [
+      {
+        id: 'general',
+        name: 'General Chat',
+        description: 'General purpose AI chat for testing',
+        system_prompt: 'You are a helpful AI assistant.',
+        temperature: 0.7,
+        top_k: 5
+      },
+      {
+        id: 'tech',
+        name: 'Technology',
+        description: 'AI chat focused on technology topics',
+        system_prompt: 'You are a technology expert AI assistant.',
+        temperature: 0.7,
+        top_k: 5
       }
-    } catch (error) {
-      console.error('Error loading industry profiles:', error)
+    ]
+    setIndustryProfiles(mockProfiles)
+    if (!selectedIndustry) {
+      onIndustryChange(mockProfiles[0])
     }
   }, [selectedIndustry, onIndustryChange])
-
-  useEffect(() => {
-    loadIndustryProfiles()
-  }, [loadIndustryProfiles])
 
   const handleIndustrySelect = (industry: IndustryProfile) => {
     onIndustryChange(industry)

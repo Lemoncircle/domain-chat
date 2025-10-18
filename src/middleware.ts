@@ -5,6 +5,10 @@ import type { NextRequest } from 'next/server'
 export async function middleware(request: NextRequest) {
   const response = NextResponse.next()
   
+  // TEMPORARILY DISABLED: Skip all authentication checks
+  console.log('Middleware: Authentication disabled for testing')
+  return response
+  
   // Skip middleware if Supabase is not properly configured
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     console.log('Middleware: Supabase not configured, skipping auth check')

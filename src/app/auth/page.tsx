@@ -18,6 +18,8 @@ export default function AuthPage() {
   // Check if user is already authenticated and redirect
   useEffect(() => {
     const checkAuth = async () => {
+      if (!supabase) return
+      
       const { data: { session } } = await supabase.auth.getSession()
       if (session) {
         router.push('/')
@@ -29,6 +31,12 @@ export default function AuthPage() {
   // Handle email/password authentication
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!supabase) {
+      setMessage('Authentication not configured')
+      return
+    }
+    
     setLoading(true)
     setMessage('')
 
@@ -66,6 +74,11 @@ export default function AuthPage() {
   const handleMagicLink = async () => {
     if (!email) {
       setMessage('Please enter your email address')
+      return
+    }
+
+    if (!supabase) {
+      setMessage('Authentication not configured')
       return
     }
 

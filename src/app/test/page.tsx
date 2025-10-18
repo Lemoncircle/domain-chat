@@ -19,6 +19,11 @@ export default function TestPage() {
     
     // Check auth status
     const checkAuth = async () => {
+      if (!supabase) {
+        setAuthStatus('Supabase client not initialized')
+        return
+      }
+      
       try {
         const { data: { session }, error } = await supabase.auth.getSession()
         if (error) {
